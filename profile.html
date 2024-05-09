@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Profile Page</title>
+</head>
+<body>
+    <h1>Welcome, {{ name }}</h1>
+    {% if key %}
+        <div class="alert alert-success">
+            Your verification key: {{ key }} (expires at {{ expiry.strftime('%Y-%m-%d %H:%M:%S') }})
+        </div>
+    {% endif %}
+    <h2>Questions for You:</h2>
+    {% if questions %}
+        {% for question in questions %}
+            <p>Q: {{ question.content }}</p>
+            {% for answer in question.answers %}
+                <form action="{{ url_for('submit_answer', answer_id=answer.id) }}" method="post">
+                    <button type="submit">{{ answer.content }}</button>
+                </form>
+            {% endfor %}
+        {% endfor %}
+    {% else %}
+        <p>No questions yet.</p>
+    {% endif %}
+    <h2>Submit a Question to Another User:</h2>
+    <form action="{{ url_for('submit_question') }}" method="post">
+        Email of User: <input type="email" name="target_email" required><br>
+        Question: <input type="text" name="content" required><br>
+        Answers (comma-separated): <input type="text" name="answers" required><br>
+        Correct Answer Index (starting from 0): <input type="number" name="correct_index" required><br>
+        <input type="submit" value="Submit Question">
+    </form>
+    <a href="{{ url_for('logout') }}">Logout</a>
+</body>
+</html>

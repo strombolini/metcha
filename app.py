@@ -25,6 +25,9 @@ class User(db.Model, UserMixin):  # Ensures inheritance from UserMixin
     name = db.Column(db.String(100), nullable=False)
     password = db.Column(db.String(100), nullable=False)
     trust_score = db.Column(db.Float, default=0.5)
+    verification_key = db.Column(db.String(100), nullable=True)
+    key_expiry = db.Column(db.DateTime, nullable=True)
+    ...
 
     def get_id(self):
         """Return the email address to satisfy Flask-Login's requirements."""
@@ -151,16 +154,16 @@ def submit_answer(answer_id):
     answer = Answer.query.get(answer_id)
     if answer.is_correct:
         flash("Correct answer! Generating your key...")
-        # Generate and save the key
-        key = VerificationKey(user_id=current_user.email, key=VerificationKey().generate_key(),
-                              expiry=datetime.datetime.now() + datetime.timedelta(minutes=1))
-        db.session.add(key)
+        # Generate the key and store it in the user model
+        user = current_user
+        user.verification_key = VerificationKey().generate_key()
+        user.key_expiry = datetime.datetime.now() + datetime.timedelta(minutes=1)
         db.session.commit()
-        return render_template('profile.html', key=key.key, expiry=key.expiry)
+        return redirect(url_for('profile'))
     else:
         flash("Incorrect answer, try again.")
         return redirect(url_for('profile'))
-
+    
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
@@ -180,8 +183,13 @@ def signup():
 @app.route('/profile')
 @login_required
 def profile():
-    questions = Question.query.filter_by(target_user_id=current_user.email).all()
-    return render_template('profile.html', name=current_user.name, questions=questions)
+    user = current_user
+    key_valid = False
+    if user.verification_key and user.key_expiry > datetime.datetime.now():
+        key_valid = True
+    
+    questions = Question.query.filter_by(target_user_id=user.email).all()
+    return render_template('profile.html', name=user.name, questions=questions, key=user.verification_key if key_valid else None, expiry=user.key_expiry if key_valid else None)
 
 @app.route('/logout')
 @login_required

@@ -20,7 +20,7 @@ login_manager.login_view = 'login'
 
 from flask_login import UserMixin
 
-class User(db.Model, UserMixin):  # Ensures inheritance from UserMixin
+class User(db.Model, UserMixin):  
     email = db.Column(db.String(120), primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     password = db.Column(db.String(100), nullable=False)
@@ -33,10 +33,6 @@ class User(db.Model, UserMixin):  # Ensures inheritance from UserMixin
         """Return the email address to satisfy Flask-Login's requirements."""
         return self.email
     
-    # The UserMixin provides default implementations of these properties:
-    # is_authenticated, is_active, is_anonymous, get_id
-
-    # If you need to customize any behavior, you can override these methods:
     def is_active(self):
         """True, as all users are active in this simple case."""
         return True

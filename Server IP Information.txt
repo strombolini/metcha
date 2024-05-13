@@ -1,8 +1,8 @@
 Wireless LAN adapter Wi-Fi:
 
    Connection-specific DNS Suffix  . : eduroam.cornell.edu
-   Link-local IPv6 Address . . . . . : fe80::e778:1651:8653:b7f0%10
-   IPv4 Address. . . . . . . . . . . : http://10.48.190.35:5000
+   Link-local IPv6 Address . . . . . : -
+   IPv4 Address. . . . . . . . . . . : -
    Subnet Mask . . . . . . . . . . . : 255.255.0.0
    Default Gateway . . . . . . . . . : 10.48.0.1
 
